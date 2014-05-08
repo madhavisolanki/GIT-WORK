@@ -45,16 +45,20 @@
     [self.requestQueue addOperationWithBlock: ^ {
         
         NSHTTPURLResponse* urlResponse = nil;
-		NSError *error = [[NSError alloc] init];
-        NSData *data = [NSURLConnection sendSynchronousRequest:serviceOperation.request
-                                             returningResponse:&urlResponse
-                                                         error:&error];
+        [NSURLConnection sendAsynchronousRequest:request queue:self.requestQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
+         {
+             NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+             
+             completion(urlResponse,responseString, data);
+             
+         }];
         
-        NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        completion(urlResponse,response, data);
         
         
     }];
+    
+    
+    
     
     return serviceOperation;
 }
